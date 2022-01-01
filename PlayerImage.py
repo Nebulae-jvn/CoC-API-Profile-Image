@@ -292,7 +292,7 @@ class PlayerImage():
                     self.drawText(draw, 'CCBackBeat-Light_5.ttf', [x, y], heroLevel, 16, [.75, 4], alignment='centered')
 
         # Townhall image
-        townHallImage = Image.open(f'./Images/Troops/Townhalls/{self.townHallLevel}_{self.townHallWeaponLevel}.png')
+        townHallImage = Image.open(f'./Images/Troops/TownHalls/{self.townHallLevel}_{self.townHallWeaponLevel}.png')
         self.troopsImage.paste(townHallImage, [0, 12])
 
 
@@ -334,7 +334,7 @@ class PlayerImage():
 
         left = Image.open(f'./Images/Empty Images/{"no" if self.clanless else ""}clanLeft.png')
         right = Image.open('./Images/Empty Images/right.png')
-        down = Image.open('./Images/Empty Images/down.png')
+        down = Image.open('./Images/Empty Images/Down.png')
         homeVillage = Image.open('./Images/Empty Images/Home Village.png')
         
         try: os.mkdir('Results')
