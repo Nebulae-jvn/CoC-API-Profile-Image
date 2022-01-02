@@ -16,6 +16,25 @@ class PlayerImage():
         self.troopsImage = Image.open('./Images/Empty Images/Empty_Troops.png')
         self.profileImage = Image.open('./Images/Empty Images/Empty_Profile.png')
         self.legendImage = Image.open('./Images/Empty Images/Empty_Legend.png')
+        self.statusCode = {
+            200: 'Succesfully collected the needed data.',
+            400: 'Client provided incorrect parameters for the request.',
+            403: 'Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.',
+            404: 'Resource was not found.',
+            429: 'Request was throttled, because amount of requests was above the threshold defined for the used API token.',
+            500: 'Unknown error happened when handling the request.',
+            503: 'Service is temprorarily unavailable because of maintenance.'
+        }
+        self.headers = {
+            'Accept': 'application/json',
+            'Authorization': f'Bearer {self.apiKey}'
+        }
+        self.response = requests.get(f'https://api.clashofclans.com/v1/players/%23{self.tag}', headers=self.headers)
+        self.data = self.response.json()
+        self.status = self.response.status_code
+        if self.status != 200:
+            raise RuntimeError(self.statusCode[self.status])
+        print(self.statusCode[self.status])
 
 
     def drawText(self, draw: ImageDraw.ImageDraw, font: int, position: tuple, text: str, fontSize: str, shadowOffset=[0, 0], shadow=True, alignment='left', color=(255, 255, 255)) -> None:
@@ -40,13 +59,8 @@ class PlayerImage():
 
 
     def getHomeBaseData(self) -> None:   
-        headers = {
-            'Accept': 'application/json',
-            'Authorization': f'Bearer {self.apiKey}'
-        }
         roles = {"member": 'Member', "admin": 'Elder', "coLeader": 'Co-leader', "leader": 'Leader',}
 
-        self.data = requests.get(f'https://api.clashofclans.com/v1/players/%23{self.tag}', headers=headers).json()
         self.name = self.data["name"]
         self.townHallLevel = self.data["townHallLevel"]
         self.townHallWeaponLevel = self.data["townHallWeaponLevel"] if "townHallWeaponLevel" in self.data.keys() else 0
@@ -75,7 +89,11 @@ class PlayerImage():
                 self.previousSeasonCups = legendStats["previousSeason"]["trophies"]
                 self.previousSeasonRank = legendStats["previousSeason"]["rank"]
             else:
-                data = requests.get('https://api.clashofclans.com/v1/leagues/29000022/seasons', headers=headers).json()
+                response = requests.get('https://api.clashofclans.com/v1/leagues/29000022/seasons', headers=self.headers)
+                data = response.json()
+                status = response.status_code
+                if status != 200:
+                    raise RuntimeError(self.statusCode[status])
                 self.previousSeasonId = data["items"][-1]["id"]
             if "rank" in legendStats["currentSeason"].keys():
                 self.inTop1000 = True
@@ -90,50 +108,28 @@ class PlayerImage():
             self.role = ''
             self.clanless = True            
 
-        if self.bestThrophies >= 5000:
-            self.bestRank = 'Legend League'
-        elif self.bestThrophies >= 4700:
-            self.bestRank = 'Titan League I'
-        elif self.bestThrophies >= 4400:
-            self.bestRank = 'Titan League II'
-        elif self.bestThrophies >= 4100:
-            self.bestRank = 'Titan League III'
-        elif self.bestThrophies >= 3800:
-            self.bestRank = 'Champion League I'    
-        elif self.bestThrophies >= 3500:
-            self.bestRank = 'Champion League II'
-        elif self.bestThrophies >= 3200:
-            self.bestRank = 'Champion League III'
-        elif self.bestThrophies >= 3000:
-            self.bestRank = 'Master League I'
-        elif self.bestThrophies >= 2800:
-            self.bestRank = 'Master League II'
-        elif self.bestThrophies >= 2600:
-            self.bestRank = 'Master League III'
-        elif self.bestThrophies >= 2400:
-            self.bestRank = 'Crystal League I'
-        elif self.bestThrophies >= 2200:
-            self.bestRank = 'Crystal League II'
-        elif self.bestThrophies >= 2000:
-            self.bestRank = 'Crystal League III'
-        elif self.bestThrophies >= 1800:
-            self.bestRank = 'Gold League I'
-        elif self.bestThrophies >= 1600:
-            self.bestRank = 'Gold League II'
-        elif self.bestThrophies >= 1400:
-            self.bestRank = 'Gold League III'
-        elif self.bestThrophies >= 1200:
-            self.bestRank = 'Silver League I'
-        elif self.bestThrophies >= 1000:
-            self.bestRank = 'Silver League II'
-        elif self.bestThrophies >= 800:
-            self.bestRank = 'Silver League III'
-        elif self.bestThrophies >= 600:
-            self.bestRank = 'Bronze League I'
-        elif self.bestThrophies >= 500:
-            self.bestRank = 'Bronze League II'
-        else:
-            self.bestRank = 'Bronze League III'
+        if self.bestThrophies >= 5000: self.bestRank = 'Legend League'
+        elif self.bestThrophies >= 4700: self.bestRank = 'Titan League I'
+        elif self.bestThrophies >= 4400: self.bestRank = 'Titan League II'
+        elif self.bestThrophies >= 4100: self.bestRank = 'Titan League III'
+        elif self.bestThrophies >= 3800: self.bestRank = 'Champion League I'    
+        elif self.bestThrophies >= 3500: self.bestRank = 'Champion League II'
+        elif self.bestThrophies >= 3200: self.bestRank = 'Champion League III'
+        elif self.bestThrophies >= 3000: self.bestRank = 'Master League I'
+        elif self.bestThrophies >= 2800: self.bestRank = 'Master League II'
+        elif self.bestThrophies >= 2600: self.bestRank = 'Master League III'
+        elif self.bestThrophies >= 2400: self.bestRank = 'Crystal League I'
+        elif self.bestThrophies >= 2200: self.bestRank = 'Crystal League II'
+        elif self.bestThrophies >= 2000: self.bestRank = 'Crystal League III'
+        elif self.bestThrophies >= 1800: self.bestRank = 'Gold League I'
+        elif self.bestThrophies >= 1600: self.bestRank = 'Gold League II'
+        elif self.bestThrophies >= 1400: self.bestRank = 'Gold League III'
+        elif self.bestThrophies >= 1200: self.bestRank = 'Silver League I'
+        elif self.bestThrophies >= 1000: self.bestRank = 'Silver League II'
+        elif self.bestThrophies >= 800: self.bestRank = 'Silver League III'
+        elif self.bestThrophies >= 600: self.bestRank = 'Bronze League I'
+        elif self.bestThrophies >= 500: self.bestRank = 'Bronze League II'
+        else: self.bestRank = 'Bronze League III'
 
         
     def makeProfileImage(self) -> None:
@@ -218,8 +214,8 @@ class PlayerImage():
             x, y = 610, 30
             noClan = Image.open('./Images/Profile/noClan.png')
             self.profileImage.paste(noClan, (x, y))
-        
-        # Disable current rank since it's not accurate
+
+        # Disable current rank since it's inaccurate
         #if self.inTop1000:
         #    inTop1000FontSizes = {1: 65, 2: 50, 3: 40}
         #    inTop1000ShadowSize = {1: [4, 12], 2: [2, 8], 3: [2, 8]}
@@ -293,7 +289,7 @@ class PlayerImage():
                     self.drawText(draw, 'CCBackBeat-Light_5.ttf', [x, y], heroLevel, 16, [.75, 4], alignment='centered')
 
         # Townhall image
-        townHallImage = Image.open(f'./Images/Troops/TownHalls/{self.townHallLevel}_{self.townHallWeaponLevel}.png')
+        townHallImage = Image.open(f'./Images/Troops/Townhalls/{self.townHallLevel}_{self.townHallWeaponLevel}.png')
         self.troopsImage.paste(townHallImage, [0, 12])
 
 
@@ -335,7 +331,7 @@ class PlayerImage():
 
         left = Image.open(f'./Images/Empty Images/{"no" if self.clanless else ""}clanLeft.png')
         right = Image.open('./Images/Empty Images/right.png')
-        down = Image.open('./Images/Empty Images/Down.png')
+        down = Image.open('./Images/Empty Images/down.png')
         homeVillage = Image.open('./Images/Empty Images/Home Village.png')
         
         try: os.mkdir('Results')
@@ -397,9 +393,7 @@ class PlayerImage():
         
 
 if __name__ == '__main__':
-    apiKey = '' # Fill in your own API key           
-    if apiKey == '':
-        raise ValueError('Please fill in an API key first. Get one on https://developer.clashofclans.com/.')
+    apiKey = '' # Fill in your own API key
 
     parser = argparse.ArgumentParser(description='This script will make an image of an account profile of Clash of Clans.')
     parser.add_argument('tag', type=str, help='the account tag of the profile.', nargs='?')
