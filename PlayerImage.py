@@ -218,12 +218,13 @@ class PlayerImage():
             x, y = 610, 30
             noClan = Image.open('./Images/Profile/noClan.png')
             self.profileImage.paste(noClan, (x, y))
-
-        if self.inTop1000:
-            inTop1000FontSizes = {1: 65, 2: 50, 3: 40}
-            inTop1000ShadowSize = {1: [4, 12], 2: [2, 8], 3: [2, 8]}
-            i = len(str(self.currentRank))
-            self.drawText(draw, 'Supercell-Magic_5.ttf', [930, 105], self.currentRank, inTop1000FontSizes[i], inTop1000ShadowSize[i], alignment='centered', color=(255, 252, 206))
+        
+        # Disable current rank since it's not accurate
+        #if self.inTop1000:
+        #    inTop1000FontSizes = {1: 65, 2: 50, 3: 40}
+        #    inTop1000ShadowSize = {1: [4, 12], 2: [2, 8], 3: [2, 8]}
+        #    i = len(str(self.currentRank))
+        #    self.drawText(draw, 'Supercell-Magic_5.ttf', [930, 105], self.currentRank, inTop1000FontSizes[i], inTop1000ShadowSize[i], alignment='centered', color=(255, 252, 206))
         
     
     def makeTroopImage(self) -> None:
